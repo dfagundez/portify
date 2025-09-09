@@ -6,6 +6,10 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   build-macos:
     runs-on: macos-latest
@@ -31,6 +35,15 @@ jobs:
     - name: Build macOS app
       run: python scripts/create_macos_app.py
     
+    - name: Verify build artifacts
+      run: |
+        ls -la dist/
+        if [ ! -f "dist/Portify.dmg" ]; then
+          echo "❌ Portify.dmg not found!"
+          exit 1
+        fi
+        echo "✅ Build artifacts verified"
+    
     - name: Upload DMG artifact
       uses: actions/upload-artifact@v4
       with:
@@ -39,12 +52,12 @@ jobs:
     
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
-        files: |
-          dist/Portify.dmg
-          dist/Portify.app
+        files: dist/Portify.dmg
         generate_release_notes: true
+        draft: false
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
