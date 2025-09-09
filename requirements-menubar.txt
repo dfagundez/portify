@@ -1,0 +1,6 @@
+# Additional dependencies for Menu Bar functionality
+pystray==0.19.5
+Pillow==10.1.0
+plyer==2.1.0  # For notifications
+pyobjc-framework-Cocoa>=11.1  # For macOS integration
+pyobjc-framework-UserNotifications>=11.1  # For native notifications

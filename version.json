@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "download_url": "https://tu-sitio-web.com/downloads/Portify.dmg",
+  "release_notes": "🎉 Primera versión de Portify!\n\n✨ Características:\n• Gestión de puertos desde la barra de menú\n• Matar procesos con un clic\n• Auto-refresh cada 5 segundos\n• Notificaciones nativas de macOS",
+  "critical": false,
+  "release_date": "2024-01-15",
+  "minimum_version": "0.1.0"
+}
