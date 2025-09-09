@@ -3,8 +3,11 @@ from setuptools import setup, find_packages
 setup(
     name="portify",
     version="1.0.0",
-    description="A lightweight CLI tool for developers to manage ports and processes",
+    description="The fastest way to manage ports and processes on macOS - Always accessible from your menu bar",
+    long_description="Portify is a macOS menu bar application that gives developers instant access to port and process management. No more switching to terminal - just click the menu bar icon to see active ports and kill processes with one click. Also includes a powerful CLI for advanced users.",
+    long_description_content_type="text/markdown",
     author="Diego Fagundez",
+    url="https://github.com/dfagundez/portify",
     packages=find_packages(),
     install_requires=[
         "typer[all]==0.9.0",
@@ -26,7 +29,7 @@ setup(
     },
     python_requires=">=3.8",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
@@ -34,6 +37,12 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
-        "Operating System :: OS Independent",
+        "Operating System :: MacOS",
+        "Operating System :: POSIX :: Linux",
+        "Topic :: Software Development :: Debuggers",
+        "Topic :: System :: Monitoring",
+        "Topic :: System :: Networking :: Monitoring",
+        "Topic :: Utilities",
     ],
+    keywords="port management, process killer, menu bar, macOS, developer tools, network monitoring",
 )

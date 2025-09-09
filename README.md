@@ -1,108 +1,154 @@
-# 🚀 Portify
+# 🎯 Portify
 
-A lightweight CLI tool for developers to quickly manage ports and processes on macOS and Linux.
+**The fastest way to manage ports and processes on macOS** - Always accessible from your menu bar, no terminal required.
 
-## ✨ Features
+![Portify Menu Bar Demo](https://via.placeholder.com/600x300/2563eb/ffffff?text=Portify+Menu+Bar+Demo)
 
-- 📋 **List active ports** - See all network connections with process information
-- ⚡ **Kill processes** - Terminate processes with a single command
-- 🎨 **Beautiful interface** - Colorful, rich CLI output with tables
-- 🔍 **Smart filtering** - Filter by process name, port number, or connection status
-- 🔄 **Real-time monitoring** - Interactive mode with auto-refresh
-- 🎯 **Menu Bar App** - Always-accessible icon in macOS menu bar
-- 🛡️ **Permission handling** - Smart fallbacks for restricted access
-- 💻 **Cross-platform** - Works on macOS and Linux
-- 🚀 **Developer-focused** - Built for productivity and speed
+## ✨ Why Portify?
+
+**Stop switching to terminal every time you need to kill a process.** Portify lives in your menu bar, giving you instant access to:
+
+- 🎯 **One-click process killing** - See what's running, click to kill
+- 🔄 **Real-time updates** - Always shows current port status
+- 🎨 **Smart visual indicators** - Color-coded status at a glance
+- 🔔 **Native notifications** - Get alerts when processes change
+- ⚡ **Zero setup** - Install once, always available
+- 🛡️ **Permission smart** - Handles macOS security gracefully
+
+## 🚀 Core Features
+
+### 🎯 **Menu Bar App** (Primary Interface)
+
+- **Always visible** - "P" icon in your macOS menu bar
+- **One-click killing** - No commands to remember
+- **Auto-refresh** - Updates every 5 seconds
+- **Smart display** - Shows most important ports first
+- **Native notifications** - System alerts for events
+- **Color-coded status** - Visual health indicators
+
+### 💻 **CLI Interface** (Power Users)
+
+- **Rich terminal output** - Beautiful tables and colors
+- **Advanced filtering** - By process, port, or status
+- **Batch operations** - Kill multiple processes
+- **System monitoring** - CPU and memory usage
+- **Cross-platform** - Works on macOS and Linux
 
 ## 🚀 Quick Start
 
-### Easy Installation
+### 📥 **Download & Install** (Recommended)
+
+1. **Download** the latest `.dmg` from [Releases](https://github.com/dfagundez/portify/releases)
+2. **Double-click** `Portify.dmg`
+3. **Drag** `Portify.app` to your Applications folder
+4. **Launch** Portify from Applications
+5. **Look for the "P" icon** in your menu bar!
+
+### 🎯 **Using the Menu Bar App**
+
+Once installed, Portify runs automatically in your menu bar:
+
+1. **Click the "P" icon** in your menu bar
+2. **See all active ports** and their processes
+3. **Click "Kill"** next to any process to terminate it
+4. **Get notifications** when processes start/stop
+
+**That's it!** No terminal commands needed.
+
+### 🔧 **Developer Installation** (CLI + Menu Bar)
+
+For developers who want both interfaces:
 
 ```bash
-# Clone the repository
-git clone https://github.com/diegofagundez/portify.git
+# Clone and install
+git clone https://github.com/dfagundez/portify.git
 cd portify
-
-# Run the installation script
 ./scripts/install.sh
+
+# Launch menu bar app
+portify menubar
+
+# Or use CLI commands
+portify list
+portify kill 1234
 ```
 
-### Manual Installation
+## 🎯 **Menu Bar App Guide**
+
+### **What You See**
+
+- **🎯 Menu Bar Icon**: Always-visible "P" with status colors
+- **📊 Active Ports List**: Current network connections
+- **❌ Kill Buttons**: One-click process termination
+- **🔄 Auto-refresh**: Updates every 5 seconds
+- **🔔 Notifications**: Alerts for important events
+
+### **Icon Status Colors**
+
+- 🔵 **Blue**: Normal operation (default)
+- 🟢 **Green**: Active listening ports detected
+- 🟡 **Yellow**: High activity warning
+- 🔴 **Red**: Issues or blocked ports detected
+- ⚫ **Gray**: No active ports found
+
+### **Menu Options**
+
+- **Refresh Now** - Manual refresh
+- **Open CLI** - Launch terminal interface
+- **Settings** - Configure refresh rate and notifications
+- **Quit** - Close Portify
+
+## 💻 **CLI Interface** (For Power Users)
+
+The CLI provides advanced features for developers who prefer terminal workflows:
+
+### **Quick CLI Examples**
 
 ```bash
-# Install dependencies
-python3 -m pip install -r requirements.txt
+# Launch menu bar app (most common)
+portify menubar
 
-# Install Portify
-python3 -m pip install -e .
-```
-
-### Usage Examples
-
-```bash
-# List all active ports and processes
+# List all active ports
 portify list
 
-# Show only listening ports
-portify list --listening
+# Kill a specific process
+portify kill 1234
+
+# Monitor in real-time
+portify monitor
 
 # Filter by process name
 portify list --filter chrome
 
-# Filter by specific port
-portify list --port 3000
-
-# Include CPU and memory usage
-portify list --system
-
-# Kill a process by PID
-portify kill 1234
-
-# Kill with confirmation skip
-portify kill 1234 --yes
-
-# Force kill (SIGKILL)
-portify kill 1234 --force
-
-# Interactive monitoring mode
-portify monitor
-
-# Launch menu bar app (macOS)
-portify menubar
-
 # Show system information
 portify info
-
-# Show version
-portify version
 ```
 
-## 🛠️ Complete Command Reference
+### **Advanced CLI Commands**
 
-### `portify list`
-
-List all active network connections and their processes.
+<details>
+<summary><strong>🔍 portify list</strong> - List active connections</summary>
 
 **Options:**
 
-- `--system, -s` - Include CPU and memory usage information
+- `--system, -s` - Include CPU and memory usage
 - `--filter, -f <name>` - Filter by process name
-- `--port, -p <number>` - Filter by specific port number
+- `--port, -p <number>` - Filter by specific port
 - `--listening, -l` - Show only listening ports
 
 **Examples:**
 
 ```bash
-portify list                    # All connections
 portify list --listening        # Only listening ports
 portify list --filter node      # Only Node.js processes
 portify list --port 3000        # Only port 3000
 portify list --system           # Include system info
 ```
 
-### `portify kill`
+</details>
 
-Kill a process by its PID.
+<details>
+<summary><strong>⚡ portify kill</strong> - Terminate processes</summary>
 
 **Options:**
 
@@ -117,9 +163,10 @@ portify kill 1234 --yes        # Kill without confirmation
 portify kill 1234 --force      # Force kill (SIGKILL)
 ```
 
-### `portify monitor`
+</details>
 
-Interactive monitoring mode with real-time updates.
+<details>
+<summary><strong>🔄 portify monitor</strong> - Real-time monitoring</summary>
 
 **Options:**
 
@@ -134,13 +181,14 @@ portify monitor --interval 5    # Monitor with 5s interval
 portify monitor --system        # Monitor with system info
 ```
 
-### `portify menubar`
+</details>
 
-Launch Portify as a menu bar application (macOS).
+<details>
+<summary><strong>🎯 portify menubar</strong> - Launch menu bar app</summary>
 
 **Options:**
 
-- `--max-ports, -m <number>` - Maximum ports to show in menu (default: 7)
+- `--max-ports, -m <number>` - Maximum ports to show (default: 7)
 - `--interval, -i <seconds>` - Refresh interval (default: 5)
 - `--no-notifications` - Disable system notifications
 - `--no-auto-refresh` - Disable automatic refresh
@@ -148,113 +196,83 @@ Launch Portify as a menu bar application (macOS).
 **Examples:**
 
 ```bash
-portify menubar                 # Launch with default settings
+portify menubar                 # Launch with defaults
 portify menubar --max-ports 10  # Show up to 10 ports
 portify menubar --interval 3    # Refresh every 3 seconds
 ```
 
-**Features:**
+</details>
 
-- 🎯 Always-visible icon in menu bar
-- 🔄 Auto-refresh every 5 seconds
-- ❌ One-click process killing
-- 🎨 Color-coded status indicators
-- 🔔 System notifications
-- 📋 Quick access to CLI
+## 🛠️ **Installation Options**
 
-### `portify info`
+### 📦 **Option 1: Download App** (Easiest)
 
-Show system information and current user privileges.
+Perfect for regular users who just want the menu bar app:
 
-### `portify version`
+1. Go to [Releases](https://github.com/dfagundez/portify/releases)
+2. Download `Portify.dmg`
+3. Install like any macOS app
+4. Launch and enjoy!
 
-Show Portify version and information.
+### 🔧 **Option 2: Developer Install** (Full Features)
 
-## 🎯 Menu Bar App (macOS)
-
-The menu bar application provides always-accessible port management directly from your macOS menu bar.
-
-### **Installation**
+For developers who want both menu bar + CLI:
 
 ```bash
-# Install menu bar dependencies
-pip install -r requirements-menubar.txt
+# Clone and install everything
+git clone https://github.com/dfagundez/portify.git
+cd portify
+./scripts/install.sh
 
-# Or install with extras
-pip install -e ".[menubar]"
-
-# Or use the installation script
-./scripts/install-menubar.sh
+# Launch menu bar app
+portify menubar
 ```
 
-### **Usage**
+### ⚡ **Option 3: CLI Only** (Minimal)
+
+If you only want command-line interface:
 
 ```bash
-portify menubar  # Launch menu bar app
+pip install git+https://github.com/dfagundez/portify.git
+portify list
 ```
 
-### **What You Get**
+## 🔧 **Development**
 
-- **🎯 Menu Bar Icon**: Always-visible "P" icon with status colors
-- **📊 Quick Overview**: See active ports at a glance
-- **❌ One-Click Kill**: Terminate processes instantly
-- **🔄 Auto-Refresh**: Updates every 5 seconds automatically
-- **🔔 Notifications**: System alerts for important events
-- **🎨 Smart Display**: Shows most important ports first
-
-### **Icon Status Colors**
-
-- 🔵 **Blue**: Normal operation
-- 🟢 **Green**: Active listening ports
-- 🟡 **Yellow**: High activity warning
-- 🔴 **Red**: Issues detected
-- ⚫ **Gray**: No active ports
-
-For detailed menu bar app documentation, see [MENUBAR_GUIDE.md](docs/MENUBAR_GUIDE.md).
-
-## 🔧 Development
-
-### Setup Development Environment
+### **Contributing Setup**
 
 ```bash
-# Clone the repository
-git clone <repository-url>
+# Clone and setup development environment
+git clone https://github.com/dfagundez/portify.git
 cd portify
 
-# Create virtual environment (recommended)
+# Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 
 # Install in development mode
-pip install -e .
+pip install -e ".[menubar]"
 ```
 
-### Project Structure
+### **Project Architecture**
 
 ```
 portify/
 ├── portify/
-│   ├── __init__.py
-│   ├── main.py              # Entry point
-│   ├── core/
-│   │   ├── port_scanner.py  # Port scanning logic
-│   │   ├── process_manager.py # Process management
-│   │   └── utils.py         # Utility functions
-│   └── cli/
-│       ├── commands.py      # CLI commands
-│       └── display.py       # Rich display formatting
-├── requirements.txt
-├── setup.py
-├── install.sh
-└── README.md
+│   ├── menubar/           # 🎯 Menu Bar App (Primary)
+│   │   ├── app.py         # Main menu bar application
+│   │   ├── menu_manager.py # Menu logic and UI
+│   │   ├── notifications.py # Native macOS notifications
+│   │   └── icons/         # App icons and assets
+│   ├── cli/               # 💻 CLI Interface (Secondary)
+│   │   ├── commands.py    # Terminal commands
+│   │   └── display.py     # Rich formatting
+│   └── core/              # 🔧 Shared Logic
+│       ├── port_scanner.py # Port scanning engine
+│       └── process_manager.py # Process management
+├── scripts/               # 📦 Build and distribution
+└── docs/                  # 📚 Documentation
 ```
-
-### Dependencies
-
-- **typer** - Modern CLI framework
-- **rich** - Beautiful terminal output
-- **psutil** - Cross-platform process utilities
-- **click** - Command line interface creation
 
 ## 🚨 Permissions & Security
 
@@ -327,4 +345,26 @@ MIT License - see LICENSE file for details.
 
 ---
 
-**Made with ❤️ for developers who need quick port management**
+## 🎯 **Why Choose Portify?**
+
+### **Before Portify:**
+
+```bash
+# Every time you need to kill a process:
+$ lsof -i :3000
+$ ps aux | grep node
+$ kill -9 1234
+# Repeat this dance 10+ times per day...
+```
+
+### **With Portify:**
+
+1. **Click "P" in menu bar** 👆
+2. **Click "Kill" next to process** ❌
+3. **Done!** ✅
+
+**Save 30+ seconds every time. That's hours per week.**
+
+---
+
+**Made with ❤️ for developers who value their time**
