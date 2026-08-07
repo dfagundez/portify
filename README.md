@@ -166,6 +166,27 @@ Settings (sliders icon, stored in your OS config directory):
 | Include established connections | off |
 | Hide window when it loses focus | off |
 
+## WSL
+
+Portify only sees the operating system it is running in, and WSL2 is a separate
+one with its own network stack.
+
+Run it **on Windows** and your WSL services do appear — but as `wslrelay.exe`,
+the bridge Windows runs to forward `localhost` into the VM. Killing that frees
+the Windows side of the port without touching the process inside Linux, and one
+relay usually fronts *every* forwarded port at once. Portify warns you before
+that happens.
+
+To manage the real processes, install the CLI inside your distribution too:
+
+```bash
+# Inside WSL
+cargo install --path crates/portify-cli    # from a checkout
+```
+
+Most WSL users end up with both: the desktop app for native Windows ports, and
+`portify` inside the distribution for everything running in Linux.
+
 ## Permissions
 
 Portify can only see and kill what your user account can.
@@ -200,6 +221,20 @@ portify/
 ```
 
 `portify-core` has no UI and no async: a full scan is milliseconds, so callers just call it on a timer. Sockets come from [`netstat2`](https://crates.io/crates/netstat2), process identity from [`sysinfo`](https://crates.io/crates/sysinfo).
+
+## Roadmap
+
+Planned work lives in issues labelled
+[`roadmap`](https://github.com/dfagundez/portify/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap).
+React with 👍 on what you want — that ordering is what decides the next build.
+
+- **See WSL ports from the Windows app.** Detect WSL, query Portify inside the
+  distribution, and show both sets of ports in one list, labelled by origin.
+- **Name the service inside `svchost.exe`.** Windows hosts dozens of unrelated
+  services in copies of one executable; asking the service control manager which
+  ones live in a PID turns twenty identical rows into useful information.
+- **Signed installers.** Removing the SmartScreen and Gatekeeper warnings needs
+  a code-signing certificate.
 
 ## Contributing
 
