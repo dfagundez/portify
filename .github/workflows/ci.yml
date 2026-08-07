@@ -12,6 +12,19 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
+  # Cheap, no toolchain, and catches the one packaging failure that reaches
+  # strangers before it reaches us: manifests still pointing at the previous
+  # release's binary after a version bump.
+  packaging:
+    name: packaging manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: node scripts/check-packaging.mjs
+
   test:
     name: test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

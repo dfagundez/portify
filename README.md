@@ -36,7 +36,7 @@ Portify is at **0.1.0** and is a ground-up Rust rewrite of an earlier Python ver
 | macOS | Same code paths, **not yet run on a Mac** |
 | Linux | CLI tested; the desktop app is built by CI but not hand-tested |
 | Installers | Built by CI, **not code-signed** — expect a SmartScreen/Gatekeeper warning |
-| Package managers | Not published yet (no winget/brew/scoop) |
+| Package managers | Scoop (CLI, from this repo's bucket). winget and Homebrew not submitted yet |
 
 ## Install
 
@@ -56,6 +56,15 @@ Download from [the latest release](https://github.com/dfagundez/portify/releases
 | Linux | `Portify_x.y.z_amd64.AppImage`, or the `.deb` |
 
 ### CLI
+
+**Scoop** (Windows) — this repository is the bucket, so there is nothing else to add:
+
+```powershell
+scoop bucket add portify https://github.com/dfagundez/portify
+scoop install portify
+```
+
+Everywhere else, download the binary:
 
 ```bash
 # Linux

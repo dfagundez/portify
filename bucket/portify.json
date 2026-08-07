@@ -1,0 +1,30 @@
+{
+    "$schema": "https://raw.githubusercontent.com/ScoopInstaller/Scoop/master/schema.json",
+    "version": "0.1.0",
+    "description": "See every port in use, and take one back with a single command.",
+    "homepage": "https://github.com/dfagundez/portify",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/dfagundez/portify/releases/download/v0.1.0/portify-cli-windows-x86_64.zip",
+            "hash": "cabe2fa84c310f45f68bea2574886bd3c2f567af859b0bec983769fddbaf78e0"
+        }
+    },
+    "bin": "portify.exe",
+    "notes": [
+        "Ports owned by services or by another user show as (hidden). Run from an",
+        "elevated prompt to see and kill them; 'portify info' says which side you are on.",
+        "",
+        "Tab-completion for PowerShell:",
+        "  portify completions powershell | Out-String | Invoke-Expression",
+        "Add that line to $PROFILE to keep it."
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/dfagundez/portify/releases/download/v$version/portify-cli-windows-x86_64.zip"
+            }
+        }
+    }
+}
