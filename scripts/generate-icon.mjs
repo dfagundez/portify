@@ -63,14 +63,20 @@ function inLetter(x, y) {
   return false;
 }
 
-/** Vertical gradient, matching the brand blue→violet of the original mark. */
+/**
+ * Vertical gradient.
+ *
+ * Both stops sit on either side of the interface accent (#2f6fed), so the icon
+ * and the app read as the same product. The earlier blue→violet ramp was
+ * inherited from the Python version and matched nothing in the UI.
+ */
+const GRADIENT = { from: [0x4d, 0x84, 0xf5], to: [0x1b, 0x4f, 0xd1] };
+
 function background(y) {
   const t = y / CANVAS;
-  return [
-    Math.round(0x3b + (0x8b - 0x3b) * t),
-    Math.round(0x7a + (0x3d - 0x7a) * t),
-    Math.round(0xf7 + (0xf0 - 0xf7) * t),
-  ];
+  return GRADIENT.from.map((from, channel) =>
+    Math.round(from + (GRADIENT.to[channel] - from) * t),
+  );
 }
 
 /* ---------- rasteriser ---------- */

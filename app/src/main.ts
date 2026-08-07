@@ -352,7 +352,7 @@ function describe(group: PortGroup, process: ProcessInfo | undefined): string {
  * Drop the port from a bind address.
  *
  * The port is already the headline of the row, so repeating it once per
- * interface ("10.41.248.88:137, 172.17.16.1:137, 192.168.0.4:137") spends the
+ * interface ("10.0.0.5:137, 172.16.0.1:137, 192.168.1.10:137") spends the
  * whole line restating what the reader just read. Handles the bracketed IPv6
  * form too, where the last colon is still the separator.
  */
