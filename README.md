@@ -40,7 +40,50 @@ Portify is at **0.1.0** and is a ground-up Rust rewrite of an earlier Python ver
 
 ## Install
 
-### From source (the only way today)
+Nothing to build and no runtime to install — every binary below is prebuilt and
+self-contained. They are **not code-signed**, so Windows shows a SmartScreen
+warning ("More info → Run anyway") and macOS a Gatekeeper one.
+
+### Desktop app
+
+Download from [the latest release](https://github.com/dfagundez/portify/releases/latest):
+
+| Platform | File |
+|---|---|
+| Windows | `Portify_x.y.z_x64-setup.exe` (or the `.msi` for deployment) |
+| macOS, Apple silicon | `Portify_x.y.z_aarch64.dmg` |
+| macOS, Intel | `Portify_x.y.z_x64.dmg` |
+| Linux | `Portify_x.y.z_amd64.AppImage`, or the `.deb` |
+
+### CLI
+
+```bash
+# Linux
+curl -sL https://github.com/dfagundez/portify/releases/latest/download/portify-cli-linux-x86_64.tar.gz | tar xz
+sudo mv portify /usr/local/bin/
+
+# macOS, Apple silicon (use portify-cli-macos-x86_64.tar.gz on Intel)
+curl -sL https://github.com/dfagundez/portify/releases/latest/download/portify-cli-macos-aarch64.tar.gz | tar xz
+sudo mv portify /usr/local/bin/
+```
+
+On Windows, unzip `portify-cli-windows-x86_64.zip` and put `portify.exe` anywhere on your `PATH`.
+
+`/usr/local/bin` rather than `~/.local/bin` or `~/.cargo/bin` on purpose: `sudo`
+replaces your `PATH` with a fixed `secure_path`, so a `portify` in your home
+directory works but `sudo portify` reports `command not found` — and reaching
+other users' processes is exactly what you need `sudo` for.
+
+Optional tab-completion — `portify completions <shell>` prints the script for
+bash, zsh, fish, PowerShell or Elvish. For zsh:
+
+```bash
+mkdir -p ~/.zsh/completions
+portify completions zsh > ~/.zsh/completions/_portify
+echo 'fpath=(~/.zsh/completions $fpath)' >> ~/.zshrc
+```
+
+### From source
 
 Needs [Rust](https://rustup.rs) 1.95+. For the app, also [Node](https://nodejs.org) 20+.
 
@@ -54,15 +97,14 @@ cargo install --path crates/portify-cli
 cd app && npm install && npm run tauri build
 ```
 
+Note that `cargo install` puts the binary in `~/.cargo/bin`, which `sudo` cannot
+see — copy it to `/usr/local/bin` if you need elevated scans.
+
 Platform prerequisites for the desktop app:
 
 - **Windows** — [WebView2](https://developer.microsoft.com/microsoft-edge/webview2/) (already present on Windows 10/11) and the MSVC build tools **with the C++ workload** — the `Microsoft.VisualStudio.2022.BuildTools` winget package alone installs no compiler and no linker, and the build fails with `linker link.exe not found`. See [docs/TESTING-WINDOWS.md](docs/TESTING-WINDOWS.md#the-msvc-linker).
 - **macOS** — Xcode command line tools.
 - **Linux** — `libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf`.
-
-### From a release
-
-Installers and CLI archives are attached to [Releases](https://github.com/dfagundez/portify/releases) once a `v*` tag is pushed. They are unsigned; on Windows, "More info → Run anyway".
 
 ## CLI
 
@@ -177,11 +219,13 @@ the Windows side of the port without touching the process inside Linux, and one
 relay usually fronts *every* forwarded port at once. Portify warns you before
 that happens.
 
-To manage the real processes, install the CLI inside your distribution too:
+To manage the real processes, install the Linux CLI inside your distribution too
+— it is a separate install from the Windows one, and the two do not conflict:
 
 ```bash
 # Inside WSL
-cargo install --path crates/portify-cli    # from a checkout
+curl -sL https://github.com/dfagundez/portify/releases/latest/download/portify-cli-linux-x86_64.tar.gz | tar xz
+sudo mv portify /usr/local/bin/
 ```
 
 Most WSL users end up with both: the desktop app for native Windows ports, and
