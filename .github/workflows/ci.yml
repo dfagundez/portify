@@ -74,10 +74,21 @@ jobs:
           cargo run -q -p portify-cli -- list --json > ports.json
           cargo run -q -p portify-cli -- info
           cargo run -q -p portify-cli -- completions bash > /dev/null
-          # Port 1 is never bound, so this must report "nothing found" (exit 2)
-          # rather than succeeding or crashing.
-          set +e
-          cargo run -q -p portify-cli -- list 1
-          code=$?
-          set -e
-          test "$code" -eq 2 || { echo "expected exit 2 for a free port, got $code"; exit 1; }
+          # Exit codes are a documented interface, so check them rather than
+          # trusting that nothing reshuffled them. The 2-vs-4 split matters
+          # most: a script must be able to tell "the port is free" from
+          # "you typed the command wrong".
+          check() {
+            expected=$1; shift
+            set +e
+            cargo run -q -p portify-cli -- "$@" >/dev/null 2>&1
+            code=$?
+            set -e
+            test "$code" -eq "$expected" \
+              || { echo "expected exit $expected from 'portify $*', got $code"; exit 1; }
+          }
+          check 2 list 1                  # port 1 is never bound: nothing found
+          check 4 --flag-that-does-not-exist
+          check 4 list --proto banana     # not a protocol
+          check 4 kill 99999              # outside the port range
+          check 0 list

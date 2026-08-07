@@ -19,7 +19,7 @@ $ portify kill 3000
 
 Two front ends over one engine:
 
-- **`portify`** — a CLI. One binary, no runtime, ~950 KB, a scan takes single-digit milliseconds.
+- **`portify`** — a CLI. One binary, no runtime, under 1 MB, a scan takes about 10 ms.
 - **Portify** — a desktop app that lives in the system tray. Search, click, port is free.
 
 Both are built from the same Rust core, so they can never disagree about what a port is or what killing one means.
@@ -75,17 +75,30 @@ directory works but `sudo portify` reports `command not found` — and reaching
 other users' processes is exactly what you need `sudo` for.
 
 Optional tab-completion — `portify completions <shell>` prints the script for
-bash, zsh, fish, PowerShell or Elvish. For zsh:
+bash, zsh, fish, PowerShell or Elvish. Where it goes depends on your setup:
 
 ```bash
+# zsh with oh-my-zsh, prezto or any framework that runs compinit for you
+portify completions zsh > "${ZSH_CACHE_DIR:-$HOME/.oh-my-zsh/cache}/completions/_portify"
+
+# plain zsh — the fpath line must come *before* your `compinit` call
 mkdir -p ~/.zsh/completions
 portify completions zsh > ~/.zsh/completions/_portify
-echo 'fpath=(~/.zsh/completions $fpath)' >> ~/.zshrc
+# then in ~/.zshrc, above compinit:  fpath=(~/.zsh/completions $fpath)
+
+# bash
+portify completions bash | sudo tee /etc/bash_completion.d/portify >/dev/null
+
+# fish
+portify completions fish > ~/.config/fish/completions/portify.fish
 ```
+
+zsh caches its completion index, so delete `~/.zcompdump*` and open a new shell
+if nothing happens on the first try.
 
 ### From source
 
-Needs [Rust](https://rustup.rs) 1.95+. For the app, also [Node](https://nodejs.org) 20+.
+Needs [Rust](https://rustup.rs) 1.95+. For the app, also [Node](https://nodejs.org) 20.19+ (Vite 7's floor; CI builds on 22).
 
 From a checkout of this repository:
 
@@ -152,7 +165,11 @@ portify list --json          # machine-readable, stable shape
 portify kill 3000 --force    # skip SIGTERM, go straight to SIGKILL
 ```
 
-Filters compose. `portify list --filter node --port 3000 --proto tcp` means all three at once.
+Filters compose — `portify list --filter node --proto tcp 3000` means all three
+at once, not whichever one wins. Ports are bare arguments, so `portify list 3000 8080`
+narrows to those two.
+
+`list`, `kill` and `watch` also answer to `ls`, `k` and `w`.
 
 <img src="docs/screenshots/cli.png" alt="Terminal showing portify list filtered to node processes, then portify kill 7003 warning that the same process also holds ports 7001 and 7002" width="760">
 
@@ -258,7 +275,7 @@ portify/
 │   ├── portify-core/     Scanning, grouping, killing, service catalogue
 │   └── portify-cli/      The `portify` binary (clap)
 ├── app/
-│   ├── src/              Frontend: TypeScript, no framework (~23 KB)
+│   ├── src/              Frontend: TypeScript, no framework (24 KB built)
 │   └── src-tauri/        Tauri v2 shell: tray, window, IPC commands
 ├── assets/               Icon sources
 └── scripts/              generate-icon.mjs — regenerates the icons

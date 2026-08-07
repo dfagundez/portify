@@ -2,6 +2,22 @@
 
 All notable changes to Portify. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Fixed
+
+- **Usage errors now exit 4, not 2.** Argument parsing errors used clap's
+  default exit code, which is the same 2 this CLI uses for "nothing found", so
+  `portify 3000 || echo free` could not tell a free port from a misspelled
+  flag. `--help` and `--version` still exit 0. Locked in by CI, which now
+  asserts every documented exit code rather than just the free-port case.
+- Documentation: the README advertised a `--port` flag that does not exist
+  (ports are bare arguments), told Linux and macOS users to install a Rust
+  toolchain when the release already ships prebuilt binaries for them, gave a
+  zsh completion snippet that silently does nothing under oh-my-zsh — it
+  appends to `.zshrc` after the framework has already run `compinit` — and
+  quoted a binary size and frontend size that no longer matched the build.
+
 ## [0.1.0] — 2026-08-07
 
 Ground-up rewrite in Rust. The Python version (tagged `v1.0.0`) is gone; nothing carries over but the name and the icon.

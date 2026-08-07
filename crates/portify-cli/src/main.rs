@@ -19,7 +19,24 @@ use cli::{Cli, Command, KillArgs, ListArgs, WatchArgs};
 use filter::Filters;
 
 fn main() -> ProcessExitCode {
-    let cli = Cli::parse();
+    // Not `Cli::parse()`: that exits with clap's own code, which is 2 for a
+    // usage error — the same 2 this CLI uses for "nothing found". A script
+    // doing `portify 3000 || ...` could not tell "the port is free" from
+    // "you misspelled the flag". Usage errors are bad input, so they get 4.
+    let cli = match Cli::try_parse() {
+        Ok(cli) => cli,
+        Err(error) => {
+            // clap prints --help and --version to stdout, real errors to
+            // stderr, and `use_stderr()` is how it tells the two apart.
+            let failed = error.use_stderr();
+            let _ = error.print();
+            return ProcessExitCode::from(if failed {
+                ExitCode::InvalidInput as u8
+            } else {
+                ExitCode::Success as u8
+            });
+        }
+    };
 
     if cli.no_color {
         // Honoured by anstream for every stream it wraps.
