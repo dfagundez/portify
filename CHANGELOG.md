@@ -11,6 +11,10 @@ All notable changes to Portify. Format based on [Keep a Changelog](https://keepa
   to submit, nobody to wait for.
 - **winget manifests**, validated against Microsoft's 1.6.0 schemas and
   [submitted](https://github.com/microsoft/winget-pkgs/pull/413867).
+- **crates.io**: `cargo install portify-cli` installs a binary named `portify`,
+  and [`portify-core`](https://crates.io/crates/portify-core) is available as a
+  library. The `-cli` suffix is not a preference — `portify` there belongs to an
+  unrelated HTTPS/SVCB library.
 - Manifests are generated and verified by script rather than by hand:
   `update-packaging.mjs` rewrites them from a published release,
   `check-packaging.mjs` re-downloads what they point at and fails on a checksum

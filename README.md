@@ -36,7 +36,7 @@ Portify is at **0.1.0** and is a ground-up Rust rewrite of an earlier Python ver
 | macOS | Same code paths, **not yet run on a Mac** |
 | Linux | CLI tested; the desktop app is built by CI but not hand-tested |
 | Installers | Built by CI, **not code-signed** — expect a SmartScreen/Gatekeeper warning |
-| Package managers | Scoop (CLI, from this repo's bucket). winget and Homebrew not submitted yet |
+| Package managers | Scoop and crates.io. winget [submitted](https://github.com/microsoft/winget-pkgs/pull/413867); Homebrew not yet |
 
 ## Install
 
@@ -64,7 +64,15 @@ scoop bucket add portify https://github.com/dfagundez/portify
 scoop install portify
 ```
 
-Everywhere else, download the binary:
+**Cargo** (anywhere Rust is installed) — the binary is named `portify`; the crate
+takes the `-cli` suffix because `portify` on crates.io belongs to an unrelated
+library:
+
+```bash
+cargo install portify-cli
+```
+
+Or download the binary — no toolchain needed:
 
 ```bash
 # Linux

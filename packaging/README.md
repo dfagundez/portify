@@ -6,6 +6,7 @@ How Portify reaches a package manager, and what is automated.
 |---|---|---|
 | Scoop | [`bucket/portify.json`](../bucket/portify.json) — this repository *is* the bucket | Automatically, on release |
 | winget | [`packaging/winget/`](winget/) | Automatically here, then a manual PR to Microsoft |
+| crates.io | the crates' own `Cargo.toml` | `cargo publish`, by hand |
 
 ## Scoop
 
@@ -67,14 +68,33 @@ Both are driven by
 [`.github/workflows/packaging.yml`](../.github/workflows/packaging.yml), which
 runs when a release is published.
 
+## crates.io
+
+```bash
+cargo publish -p portify-core     # first: the CLI depends on it
+cargo publish -p portify-cli      # once the index has the core
+```
+
+Order matters — crates.io rejects a crate whose dependency it has never heard
+of, so `portify-cli` cannot go first.
+
+`portify` is taken there by an unrelated HTTPS/SVCB library, so the CLI is
+published as [`portify-cli`](https://crates.io/crates/portify-cli). The binary
+it installs is still named `portify`.
+
+`portify-app` is marked `publish = false`. It was publishable by default, and
+`generate_context!` embeds `app/dist` at compile time — a published copy would
+fail to build for everyone who downloaded it.
+
+The `portify-core` README's examples are compiled as doctests (see the
+`Readme` struct in its `lib.rs`), because the crates.io landing page is the
+first code anyone reads and the last anyone checks.
+
 ## Not done yet
 
 - **Homebrew.** A tap has to be its own repository (`homebrew-portify`), and
   Portify has never been run on a Mac. Shipping a formula for a platform nobody
   has tested would be selling something unverified.
-- **crates.io.** `portify` is taken by an unrelated library, so the CLI would
-  publish as `portify-cli` and install with `cargo install portify-cli`. Worth
-  doing; it just is not done.
 - **Signed installers.** Tracked in
   [#4](https://github.com/dfagundez/portify/issues/4). Until then both winget
   and a direct download raise a SmartScreen warning.
