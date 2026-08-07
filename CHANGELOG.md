@@ -2,7 +2,7 @@
 
 All notable changes to Portify. Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] — unreleased
+## [0.1.0] — 2026-08-07
 
 Ground-up rewrite in Rust. The Python version (tagged `v1.0.0`) is gone; nothing carries over but the name and the icon.
 
