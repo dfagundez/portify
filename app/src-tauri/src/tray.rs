@@ -62,18 +62,20 @@ pub fn build(app: &AppHandle) -> tauri::Result<()> {
 ///
 /// macOS expects a monochrome template image that the system tints for light
 /// and dark menu bars; Windows and Linux show the full-colour app icon.
-fn tray_icon(app: &AppHandle) -> Option<tauri::image::Image<'static>> {
-    #[cfg(target_os = "macos")]
-    {
-        let _ = app;
-        return tauri::image::Image::from_bytes(include_bytes!("../icons/tray-mono.png")).ok();
-    }
+///
+/// Two whole functions rather than one with `cfg` blocks inside: a `cfg` block
+/// that has to `return` because a sibling block might follow it is exactly the
+/// shape clippy rejects, and only the platform being compiled would ever see the
+/// complaint.
+#[cfg(target_os = "macos")]
+fn tray_icon(_app: &AppHandle) -> Option<tauri::image::Image<'static>> {
+    tauri::image::Image::from_bytes(include_bytes!("../icons/tray-mono.png")).ok()
+}
 
-    #[cfg(not(target_os = "macos"))]
-    {
-        // The bundled icon is borrowed from the app handle; `to_owned` lifts it
-        // to 'static so the tray can outlive this call.
-        app.default_window_icon()
-            .map(|icon| icon.clone().to_owned())
-    }
+#[cfg(not(target_os = "macos"))]
+fn tray_icon(app: &AppHandle) -> Option<tauri::image::Image<'static>> {
+    // The bundled icon is borrowed from the app handle; `to_owned` lifts it to
+    // 'static so the tray can outlive this call.
+    app.default_window_icon()
+        .map(|icon| icon.clone().to_owned())
 }
