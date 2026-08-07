@@ -228,12 +228,12 @@ Planned work lives in issues labelled
 [`roadmap`](https://github.com/dfagundez/portify/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap).
 React with 👍 on what you want — that ordering is what decides the next build.
 
-- **See WSL ports from the Windows app.** Detect WSL, query Portify inside the
+- **[See WSL ports from the Windows app](https://github.com/dfagundez/portify/issues/2).** Detect WSL, query Portify inside the
   distribution, and show both sets of ports in one list, labelled by origin.
-- **Name the service inside `svchost.exe`.** Windows hosts dozens of unrelated
+- **[Name the service inside `svchost.exe`](https://github.com/dfagundez/portify/issues/3).** Windows hosts dozens of unrelated
   services in copies of one executable; asking the service control manager which
   ones live in a PID turns twenty identical rows into useful information.
-- **Signed installers.** Removing the SmartScreen and Gatekeeper warnings needs
+- **[Signed installers](https://github.com/dfagundez/portify/issues/4).** Removing the SmartScreen and Gatekeeper warnings needs
   a code-signing certificate.
 
 ## Contributing
