@@ -70,7 +70,14 @@ function inLetter(x, y) {
  * and the app read as the same product. The earlier blue→violet ramp was
  * inherited from the Python version and matched nothing in the UI.
  */
-const GRADIENT = { from: [0x4d, 0x84, 0xf5], to: [0x1b, 0x4f, 0xd1] };
+/*
+ * Both stops sit near hue 217°, a little cooler than the accent's 220°, and the
+ * ramp is deliberately shallow. Hue alone was never the problem — the previous
+ * bottom stop measured 223°, nowhere near violet — but a dark, saturated blue
+ * at 16px, surrounded by bright tray icons, reads as purple anyway. Keeping the
+ * darkest point lighter is what fixes the perception.
+ */
+const GRADIENT = { from: [0x4f, 0x8f, 0xf7], to: [0x1a, 0x6a, 0xe8] };
 
 function background(y) {
   const t = y / CANVAS;
