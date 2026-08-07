@@ -1,0 +1,539 @@
+/*
+ * Portify UI.
+ *
+ * One accent colour, one neutral ramp, everything else is spacing and weight.
+ * Both themes are defined up front and follow the OS: a tray utility that
+ * flashes white on a dark desktop is the fastest way to look unfinished.
+ */
+
+:root {
+  --bg: #ffffff;
+  --bg-raised: #f6f7f9;
+  --bg-hover: #eef0f3;
+  --border: #e3e6ea;
+  --border-strong: #d3d8de;
+  --text: #14181d;
+  --text-muted: #6b7480;
+  --text-faint: #99a1ac;
+  --accent: #2f6fed;
+  --accent-soft: #e8f0fe;
+  --danger: #d7263d;
+  --danger-soft: #fdecee;
+  --good: #1a8f4c;
+  --warn: #b7791f;
+
+  --radius: 8px;
+  --radius-sm: 6px;
+  --row-height: 46px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI",
+    Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Mono", "SF Mono", "JetBrains Mono", Consolas,
+    "Liberation Mono", monospace;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16191d;
+    --bg-raised: #1d2126;
+    --bg-hover: #252a31;
+    --border: #2a2f36;
+    --border-strong: #383f48;
+    --text: #e8ebee;
+    --text-muted: #9aa3ad;
+    --text-faint: #6c757f;
+    --accent: #6ea0ff;
+    --accent-soft: #1e2a42;
+    --danger: #ff6b7d;
+    --danger-soft: #3a1f25;
+    --good: #56d38a;
+    --warn: #e0b354;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  /* The window is a tool, not a document: no accidental text selection. */
+  user-select: none;
+  cursor: default;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ---------- title bar ---------- */
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 0 14px;
+  height: 44px;
+  flex: 0 0 auto;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.brand .name {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  transition: background 160ms ease;
+}
+
+.dot[data-state="active"] {
+  background: var(--good);
+}
+.dot[data-state="busy"] {
+  background: var(--warn);
+}
+.dot[data-state="error"] {
+  background: var(--danger);
+}
+
+.search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.search input {
+  width: 100%;
+  height: 28px;
+  padding: 0 10px;
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  user-select: text;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.search input::placeholder {
+  color: var(--text-faint);
+}
+
+.search input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* Remove the WebKit/Chromium search widgets; the field is already minimal. */
+.search input::-webkit-search-decoration,
+.search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: default;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.icon-button:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.icon-button.danger-hover:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.icon-button svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-button.spinning svg {
+  animation: spin 600ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- settings ---------- */
+
+.settings {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.settings[hidden] {
+  display: none;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+}
+
+.field.switch {
+  gap: 8px;
+}
+
+.field select {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px 6px;
+  outline: none;
+}
+
+.field input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 26px;
+  padding: 0 8px;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  user-select: text;
+}
+
+.field input[type="text"]:focus {
+  border-color: var(--accent);
+}
+
+.field input[type="text"].invalid {
+  border-color: var(--danger);
+}
+
+.text-button {
+  flex: 0 0 auto;
+  height: 26px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: default;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.text-button:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.text-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.field-note {
+  margin: -6px 0 0;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.field-note.error {
+  color: var(--danger);
+}
+
+.field input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  margin: 0;
+}
+
+/* ---------- list ---------- */
+
+.list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--row-height);
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.row:hover {
+  background: var(--bg-hover);
+}
+
+.row .port {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.row .meta {
+  min-width: 0;
+}
+
+.row .process {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row .process .name {
+  font-weight: 500;
+}
+
+.row .process .pid {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.row .detail {
+  margin-top: 1px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row .detail.warning {
+  color: var(--warn);
+  font-weight: 500;
+}
+
+.row .tag {
+  display: inline-block;
+  padding: 0 5px;
+  margin-right: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+}
+
+.row .tag.udp {
+  color: var(--warn);
+}
+
+.row.hidden-owner .process .name {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* The kill button only materialises on hover or keyboard focus, so the resting
+   state of the list is calm and there is nothing destructive under the cursor
+   by accident. */
+.kill {
+  height: 26px;
+  padding: 0 12px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--danger);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  cursor: default;
+  transition: opacity 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+/* A button in either state stays visible even when the pointer wanders off the
+   row — losing sight of a pending confirmation would be worse than the noise. */
+.row:hover .kill,
+.kill:focus-visible,
+.kill[data-state] {
+  opacity: 1;
+  border-color: var(--border-strong);
+}
+
+.kill:hover {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+/* Armed. This is the state whose entire purpose is to receive a second click,
+   so it must stay interactive — it previously shared a rule with the in-flight
+   state below and inherited `pointer-events: none`, which made confirming a
+   kill impossible. */
+.kill[data-state="armed"] {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+/* In flight: deliberately inert, so a double click cannot queue a second kill. */
+.kill[data-state="killing"] {
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.kill:disabled {
+  color: var(--text-faint);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ---------- empty & error states ---------- */
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100%;
+  min-height: 160px;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.placeholder .headline {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.placeholder.error .headline {
+  color: var(--danger);
+}
+
+/* ---------- status bar ---------- */
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 14px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  background: var(--bg-raised);
+  border-top: 1px solid var(--border);
+}
+
+.statusbar .muted {
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusbar .good {
+  color: var(--good);
+}
+
+.statusbar .bad {
+  color: var(--danger);
+}
+
+/* ---------- scrollbar ---------- */
+
+.list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 3px solid var(--bg);
+  border-radius: 6px;
+}
+
+.list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

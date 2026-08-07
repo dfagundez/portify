@@ -1,0 +1,27 @@
+[package]
+name = "portify-cli"
+description = "Find out what is holding a port and take it back, from the terminal"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "portify"
+path = "src/main.rs"
+
+[dependencies]
+portify-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+clap = { version = "4.6.5", features = ["derive", "wrap_help"] }
+clap_complete = "4.6.8"
+# anstream enables VT processing on Windows consoles and strips styling when
+# output is piped or NO_COLOR is set, so the rest of the code can style freely.
+anstream = "1.0.0"
+owo-colors = "4.3.0"
+# Already in the tree via clap's wrap_help; using it directly costs nothing and
+# is the only reliable way to get the width on Windows, where COLUMNS is unset.
+terminal_size = "0.4.4"

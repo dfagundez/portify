@@ -1,370 +1,210 @@
-# 🎯 Portify
+# Portify
 
-**The fastest way to manage ports and processes on macOS** - Always accessible from your menu bar, no terminal required.
+**See every port in use, and take one back with a click.**
 
-![Portify Menu Bar Demo](https://via.placeholder.com/600x300/2563eb/ffffff?text=Portify+Menu+Bar+Demo)
+You know the drill: `EADDRINUSE: address already in use :::3000`. Then `netstat -ano | findstr 3000`, squint at a PID, `taskkill /PID 12841 /F`. Three commands and a visual lookup, ten times a day.
 
-## ✨ Why Portify?
+Portify replaces that with:
 
-**Stop switching to terminal every time you need to kill a process.** Portify lives in your menu bar, giving you instant access to:
-
-- 🎯 **One-click process killing** - See what's running, click to kill
-- 🔄 **Real-time updates** - Always shows current port status
-- 🎨 **Smart visual indicators** - Color-coded status at a glance
-- 🔔 **Native notifications** - Get alerts when processes change
-- ⚡ **Zero setup** - Install once, always available
-- 🛡️ **Permission smart** - Handles macOS security gracefully
-
-## 🚀 Core Features
-
-### 🎯 **Menu Bar App** (Primary Interface)
-
-- **Always visible** - "P" icon in your macOS menu bar
-- **One-click killing** - No commands to remember
-- **Auto-refresh** - Updates every 5 seconds
-- **Smart display** - Shows most important ports first
-- **Native notifications** - System alerts for events
-- **Color-coded status** - Visual health indicators
-
-### 💻 **CLI Interface** (Power Users)
-
-- **Rich terminal output** - Beautiful tables and colors
-- **Advanced filtering** - By process, port, or status
-- **Batch operations** - Kill multiple processes
-- **System monitoring** - CPU and memory usage
-- **Cross-platform** - Works on macOS and Linux
-
-## 🚀 Quick Start
-
-### 📥 **Download & Install** (Recommended)
-
-1. **Download** the latest `.dmg` from [Releases](https://github.com/dfagundez/portify/releases)
-2. **Double-click** `Portify.dmg`
-3. **Drag** `Portify.app` to your Applications folder
-4. **Launch** Portify from Applications
-5. **Look for the "P" icon** in your menu bar!
-
-### 🎯 **Using the Menu Bar App**
-
-Once installed, Portify runs automatically in your menu bar:
-
-1. **Click the "P" icon** in your menu bar
-2. **See all active ports** and their processes
-3. **Click "Kill"** next to any process to terminate it
-4. **Get notifications** when processes start/stop
-
-**That's it!** No terminal commands needed.
-
-### 🔧 **Developer Installation** (CLI + Menu Bar)
-
-For developers who want both interfaces:
-
-```bash
-# Clone and install
-git clone https://github.com/dfagundez/portify.git
-cd portify
-./scripts/install.sh
-
-# Launch menu bar app
-portify menubar
-
-# Or use CLI commands
-portify list
-portify kill 1234
+```console
+$ portify kill 3000
+✔ port 3000 freed: node (PID 12841) terminated
 ```
 
-## 🎯 **Menu Bar App Guide**
+…or one click in the desktop app.
 
-### **What You See**
+<img src="docs/screenshots/app.png" alt="The Portify window listing development ports, each with its process, memory use and service name" width="480">
 
-- **🎯 Menu Bar Icon**: Always-visible "P" with status colors
-- **📊 Active Ports List**: Current network connections
-- **❌ Kill Buttons**: One-click process termination
-- **🔄 Auto-refresh**: Updates every 5 seconds
-- **🔔 Notifications**: Alerts for important events
+## What it is
 
-### **Icon Status Colors**
+Two front ends over one engine:
 
-- 🔵 **Blue**: Normal operation (default)
-- 🟢 **Green**: Active listening ports detected
-- 🟡 **Yellow**: High activity warning
-- 🔴 **Red**: Issues or blocked ports detected
-- ⚫ **Gray**: No active ports found
+- **`portify`** — a CLI. One binary, no runtime, ~950 KB, a scan takes single-digit milliseconds.
+- **Portify** — a desktop app that lives in the system tray. Search, click, port is free.
 
-### **Menu Options**
+Both are built from the same Rust core, so they can never disagree about what a port is or what killing one means.
 
-- **Refresh Now** - Manual refresh
-- **Open CLI** - Launch terminal interface
-- **Settings** - Configure refresh rate and notifications
-- **Quit** - Close Portify
+## Status
 
-## 💻 **CLI Interface** (For Power Users)
+Portify is at **0.1.0** and is a ground-up Rust rewrite of an earlier Python version. Being straight about where it stands:
 
-The CLI provides advanced features for developers who prefer terminal workflows:
+| | State |
+|---|---|
+| CLI | Tested by hand on Windows and Linux; compiles clean for macOS |
+| Desktop app | Verified by hand on Windows 11: tray, hotkey, list, filter, kill with confirmation, force-kill, notifications, settings persistence, single instance |
+| Windows | Primary target. CLI and app both verified end to end |
+| macOS | Same code paths, **not yet run on a Mac** |
+| Linux | CLI tested; the desktop app is built by CI but not hand-tested |
+| Installers | Built by CI, **not code-signed** — expect a SmartScreen/Gatekeeper warning |
+| Package managers | Not published yet (no winget/brew/scoop) |
 
-### **Quick CLI Examples**
+## Install
 
-```bash
-# Launch menu bar app (most common)
-portify menubar
+### From source (the only way today)
 
-# List all active ports
-portify list
+Needs [Rust](https://rustup.rs) 1.95+. For the app, also [Node](https://nodejs.org) 20+.
 
-# Kill a specific process
-portify kill 1234
-
-# Monitor in real-time
-portify monitor
-
-# Filter by process name
-portify list --filter chrome
-
-# Show system information
-portify info
-```
-
-### **Advanced CLI Commands**
-
-<details>
-<summary><strong>🔍 portify list</strong> - List active connections</summary>
-
-**Options:**
-
-- `--system, -s` - Include CPU and memory usage
-- `--filter, -f <name>` - Filter by process name
-- `--port, -p <number>` - Filter by specific port
-- `--listening, -l` - Show only listening ports
-
-**Examples:**
+From a checkout of this repository:
 
 ```bash
-portify list --listening        # Only listening ports
-portify list --filter node      # Only Node.js processes
-portify list --port 3000        # Only port 3000
-portify list --system           # Include system info
+# CLI
+cargo install --path crates/portify-cli
+
+# Desktop app
+cd app && npm install && npm run tauri build
 ```
 
-</details>
+Platform prerequisites for the desktop app:
 
-<details>
-<summary><strong>⚡ portify kill</strong> - Terminate processes</summary>
+- **Windows** — [WebView2](https://developer.microsoft.com/microsoft-edge/webview2/) (already present on Windows 10/11) and the MSVC build tools **with the C++ workload** — the `Microsoft.VisualStudio.2022.BuildTools` winget package alone installs no compiler and no linker, and the build fails with `linker link.exe not found`. See [docs/TESTING-WINDOWS.md](docs/TESTING-WINDOWS.md#the-msvc-linker).
+- **macOS** — Xcode command line tools.
+- **Linux** — `libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf`.
 
-**Options:**
+### From a release
 
-- `--force, -f` - Use SIGKILL instead of SIGTERM
-- `--yes, -y` - Skip confirmation prompt
+Installers and CLI archives are attached to [Releases](https://github.com/dfagundez/portify/releases) once a `v*` tag is pushed. They are unsigned; on Windows, "More info → Run anyway".
 
-**Examples:**
+## CLI
+
+```console
+$ portify
+ PORT  PROTO  PROCESS       PID    MEMORY  SERVICE
+ 3000  TCP    node       753572  236.7 MB  Dev server (Node/Rails/Grafana)
+ 5432  TCP    postgres     4410   28.1 MB  PostgreSQL
+ 6379  TCP    redis-server 4711   12.3 MB  Redis
+
+ 3 ports  ·  7 ms
+```
+
+One row per port, not one per socket: a dev server binding IPv4 and IPv6 on three interfaces is one line, the way you think about it.
+
+Outbound UDP client sockets — a browser on QUIC, a VPN agent phoning home — are
+hidden by default. They sit on OS-assigned ephemeral ports, nobody is ever trying
+to free one, and on Windows they outnumber real listeners about two to one.
+`--all` shows them; naming a port explicitly (`portify 54995`) always finds it.
+
+### Commands
+
+| Command | What it does |
+|---|---|
+| `portify` | List every port in use |
+| `portify 3000` | Show what is holding port 3000 |
+| `portify kill 3000` | Free port 3000 |
+| `portify kill 3000 8080 -y` | Free several ports, no prompt |
+| `portify kill --pid 12841` | Kill a specific process |
+| `portify watch` | Live view, refreshed on an interval |
+| `portify info` | Host details and whether you are elevated |
+| `portify completions <shell>` | Shell completion script |
+
+Bare numbers are **ports**, never PIDs. Killing by PID is always explicit via `--pid`, so a typo can't take down an unrelated process.
+
+### Options worth knowing
 
 ```bash
-portify kill 1234              # Kill with confirmation
-portify kill 1234 --yes        # Kill without confirmation
-portify kill 1234 --force      # Force kill (SIGKILL)
+portify list --all           # everything: established connections and outbound UDP sockets
+portify list --filter node   # match process name, path or command line
+portify list --proto udp     # one protocol
+portify list --raw           # one row per socket instead of per port
+portify list --wide          # show full command lines
+portify list --json          # machine-readable, stable shape
+portify kill 3000 --force    # skip SIGTERM, go straight to SIGKILL
 ```
 
-</details>
+Filters compose. `portify list --filter node --port 3000 --proto tcp` means all three at once.
 
-<details>
-<summary><strong>🔄 portify monitor</strong> - Real-time monitoring</summary>
+<img src="docs/screenshots/cli.png" alt="Terminal showing portify list filtered to node processes, then portify kill 7003 warning that the same process also holds ports 7001 and 7002" width="760">
 
-**Options:**
+### Exit codes
 
-- `--interval, -i <seconds>` - Refresh interval (default: 2)
-- `--system, -s` - Include CPU and memory usage
-
-**Examples:**
+| Code | Meaning |
+|---|---|
+| 0 | Success |
+| 2 | Nothing found |
+| 3 | Permission denied |
+| 4 | Bad input |
+| 5 | Internal error |
 
 ```bash
-portify monitor                 # Monitor with 2s interval
-portify monitor --interval 5    # Monitor with 5s interval
-portify monitor --system        # Monitor with system info
+portify 3000 >/dev/null || echo "port 3000 is free"
 ```
 
-</details>
+## Desktop app
 
-<details>
-<summary><strong>🎯 portify menubar</strong> - Launch menu bar app</summary>
+Lives in the tray. Left-click the icon to show or hide the window; right-click for the menu.
 
-**Options:**
+- **`Ctrl+Alt+P` from anywhere** shows or hides the window, even when Portify has no focus
+- Every port in use, one row each, refreshed on your interval
+- Type to filter by port, process, PID, service or command line
+- **Kill** on any row — a second click confirms, shift-click skips the confirmation and force-kills
+- No taskbar button: the window comes and goes, the tray icon stays
+- Closing the window hides it; the app quits from the tray menu only
+- Follows your system light/dark theme
 
-- `--max-ports, -m <number>` - Maximum ports to show (default: 7)
-- `--interval, -i <seconds>` - Refresh interval (default: 5)
-- `--no-notifications` - Disable system notifications
-- `--no-auto-refresh` - Disable automatic refresh
+### Killing is deliberate
 
-**Examples:**
+The first click arms the row, the second confirms — and in between, Portify tells
+you what *else* goes down with it. One process fronting several ports is common
+(a WSL relay, a reverse proxy, a dev server with a debugger attached), so "free
+port 7003" can quietly mean "drop three of them".
 
-```bash
-portify menubar                 # Launch with defaults
-portify menubar --max-ports 10  # Show up to 10 ports
-portify menubar --interval 3    # Refresh every 3 seconds
-```
+<img src="docs/screenshots/kill-warning.png" alt="A row armed for killing, warning that the process also holds ports 7001 and 7002" width="480">
 
-</details>
+Shift-click skips the confirmation and force-kills immediately.
 
-## 🛠️ **Installation Options**
+### From the tray
 
-### 📦 **Option 1: Download App** (Easiest)
+<img src="docs/screenshots/tray-menu.png" alt="The Portify tray icon menu with Open Portify, Refresh now and Quit Portify" width="280">
 
-Perfect for regular users who just want the menu bar app:
+Settings (sliders icon, stored in your OS config directory):
 
-1. Go to [Releases](https://github.com/dfagundez/portify/releases)
-2. Download `Portify.dmg`
-3. Install like any macOS app
-4. Launch and enjoy!
+| Setting | Default |
+|---|---|
+| Refresh interval | 5 s (or manual) |
+| Show / hide shortcut | `Ctrl+Alt+P` (editable, or empty to disable) |
+| Notify on kill result | on |
+| Ask before killing | on |
+| Include established connections | off |
+| Hide window when it loses focus | off |
 
-### 🔧 **Option 2: Developer Install** (Full Features)
+## Permissions
 
-For developers who want both menu bar + CLI:
+Portify can only see and kill what your user account can.
 
-```bash
-# Clone and install everything
-git clone https://github.com/dfagundez/portify.git
-cd portify
-./scripts/install.sh
+- **Windows** — ports owned by other users, services, or elevated processes show as `(hidden)` with no PID. Run Portify as Administrator to see and kill them.
+- **macOS / Linux** — same, with `sudo`.
 
-# Launch menu bar app
-portify menubar
-```
+`portify info` tells you which side of that line you are on. Portify never asks for elevation on your behalf and never escalates silently.
 
-### ⚡ **Option 3: CLI Only** (Minimal)
+### Safety rules
 
-If you only want command-line interface:
+Portify refuses to kill:
 
-```bash
-pip install git+https://github.com/dfagundez/portify.git
-portify list
-```
+- itself
+- PID 0
+- PID 1 (init) on Unix, PID 4 (System) on Windows
 
-## 🔧 **Development**
+A graceful kill sends SIGTERM, waits, and escalates to SIGKILL only if the process ignores it — because "the kill succeeded but the port is still taken" is the one outcome this tool must never produce. On Windows, where there is no SIGTERM, both modes are a single `TerminateProcess`.
 
-### **Contributing Setup**
-
-```bash
-# Clone and setup development environment
-git clone https://github.com/dfagundez/portify.git
-cd portify
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install in development mode
-pip install -e ".[menubar]"
-```
-
-### **Project Architecture**
+## How it is built
 
 ```
 portify/
-├── portify/
-│   ├── menubar/           # 🎯 Menu Bar App (Primary)
-│   │   ├── app.py         # Main menu bar application
-│   │   ├── menu_manager.py # Menu logic and UI
-│   │   ├── notifications.py # Native macOS notifications
-│   │   └── icons/         # App icons and assets
-│   ├── cli/               # 💻 CLI Interface (Secondary)
-│   │   ├── commands.py    # Terminal commands
-│   │   └── display.py     # Rich formatting
-│   └── core/              # 🔧 Shared Logic
-│       ├── port_scanner.py # Port scanning engine
-│       └── process_manager.py # Process management
-├── scripts/               # 📦 Build and distribution
-└── docs/                  # 📚 Documentation
+├── crates/
+│   ├── portify-core/     Scanning, grouping, killing, service catalogue
+│   └── portify-cli/      The `portify` binary (clap)
+├── app/
+│   ├── src/              Frontend: TypeScript, no framework (~23 KB)
+│   └── src-tauri/        Tauri v2 shell: tray, window, IPC commands
+├── assets/               Icon sources
+└── scripts/              generate-icon.mjs — regenerates the icons
 ```
 
-## 🚨 Permissions & Security
+`portify-core` has no UI and no async: a full scan is milliseconds, so callers just call it on a timer. Sockets come from [`netstat2`](https://crates.io/crates/netstat2), process identity from [`sysinfo`](https://crates.io/crates/sysinfo).
 
-### macOS Considerations
+## Contributing
 
-On macOS, some operations may require additional permissions:
+See [CONTRIBUTING.md](CONTRIBUTING.md). In short: `cargo test --workspace`, `cargo clippy --workspace --all-targets`, `cargo fmt --all`, and build the frontend before touching the app crate.
 
-- **Full Disk Access** - For complete process information
-- **Developer Tools** - May be required for some system calls
-- **sudo privileges** - For killing system processes
+## License
 
-### Linux Considerations
-
-On Linux, you may need:
-
-- **sudo privileges** - For killing processes owned by other users
-- **proc filesystem access** - Usually available by default
-
-### Security Notes
-
-- Portify only reads process information and network connections
-- Process termination requires appropriate permissions
-- No data is transmitted or stored externally
-- All operations are performed locally
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**"Access Denied" errors:**
-
-- Try running with `sudo` for system processes
-- On macOS, grant Full Disk Access in System Preferences
-
-**"Process not found" errors:**
-
-- Process may have already terminated
-- PID may be invalid or expired
-
-**Empty port list:**
-
-- Check if you have permission to read network connections
-- Try running with elevated privileges
-
-**Installation issues:**
-
-- Ensure Python 3.8+ is installed
-- Make sure pip is up to date: `pip install --upgrade pip`
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Guidelines
-
-1. Follow PEP 8 style guidelines
-2. Add type hints where appropriate
-3. Include docstrings for functions and classes
-4. Test on both macOS and Linux when possible
-
-## 📝 License
-
-MIT License - see LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Built with [Typer](https://typer.tiangolo.com/) for the CLI framework
-- Styled with [Rich](https://rich.readthedocs.io/) for beautiful output
-- Process management via [psutil](https://psutil.readthedocs.io/)
-
----
-
-## 🎯 **Why Choose Portify?**
-
-### **Before Portify:**
-
-```bash
-# Every time you need to kill a process:
-$ lsof -i :3000
-$ ps aux | grep node
-$ kill -9 1234
-# Repeat this dance 10+ times per day...
-```
-
-### **With Portify:**
-
-1. **Click "P" in menu bar** 👆
-2. **Click "Kill" next to process** ❌
-3. **Done!** ✅
-
-**Save 30+ seconds every time. That's hours per week.**
-
----
-
-**Made with ❤️ for developers who value their time**
+MIT — see [LICENSE](LICENSE).

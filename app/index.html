@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portify</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- The whole header is the drag handle: the window has no OS chrome. -->
+      <header class="titlebar" data-tauri-drag-region>
+        <div class="brand" data-tauri-drag-region>
+          <span class="dot" id="status-dot" aria-hidden="true"></span>
+          <span class="name" data-tauri-drag-region>Portify</span>
+        </div>
+
+        <div class="search">
+          <input
+            id="search"
+            type="search"
+            placeholder="Filter by port, process or service"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Filter ports"
+          />
+        </div>
+
+        <div class="actions">
+          <button id="refresh" class="icon-button" title="Refresh now" aria-label="Refresh now">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3" />
+            </svg>
+          </button>
+          <!-- Sliders, not a cog: a circle with radiating lines reads as a sun
+               at 15px, which is what the first tester saw. -->
+          <button id="settings-toggle" class="icon-button" title="Settings" aria-label="Settings">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M2 4.75h4.5M11 4.75H14M2 11.25h2.5M9 11.25h5" />
+              <circle cx="8.75" cy="4.75" r="1.9" />
+              <circle cx="6.75" cy="11.25" r="1.9" />
+            </svg>
+          </button>
+          <button id="close" class="icon-button danger-hover" title="Hide window" aria-label="Hide window">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="m4 4 8 8M12 4l-8 8" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <section id="settings" class="settings" hidden>
+        <label class="field">
+          <span>Refresh every</span>
+          <select id="setting-interval">
+            <option value="0">Manual only</option>
+            <option value="2">2 seconds</option>
+            <option value="5">5 seconds</option>
+            <option value="10">10 seconds</option>
+            <option value="30">30 seconds</option>
+          </select>
+        </label>
+
+        <div class="field">
+          <span>Show / hide shortcut</span>
+          <input
+            id="setting-shortcut"
+            type="text"
+            spellcheck="false"
+            autocomplete="off"
+            placeholder="Ctrl+Alt+P"
+            aria-label="Global show and hide shortcut"
+          />
+          <button id="shortcut-reset" class="text-button" type="button">Reset</button>
+        </div>
+        <p class="field-note" id="shortcut-note">
+          Works from anywhere, even when Portify is hidden. Leave empty to disable.
+        </p>
+
+        <label class="field switch">
+          <input type="checkbox" id="setting-notifications" />
+          <span>Notify me when a kill succeeds or fails</span>
+        </label>
+
+        <label class="field switch">
+          <input type="checkbox" id="setting-confirm" />
+          <span>Ask before killing</span>
+        </label>
+
+        <label class="field switch">
+          <input type="checkbox" id="setting-all" />
+          <span>Include established connections, not just open ports</span>
+        </label>
+
+        <label class="field switch">
+          <input type="checkbox" id="setting-hide-on-blur" />
+          <span>Hide the window when it loses focus</span>
+        </label>
+      </section>
+
+      <!-- Rendered by the markup, not by script: the first scan is fast but the
+           webview still paints before JavaScript has run, and an empty window is
+           indistinguishable from a broken one. -->
+      <main class="list" id="list" role="list" aria-live="polite">
+        <div class="placeholder">
+          <div class="headline">Scanning…</div>
+          <div>Reading the socket table.</div>
+        </div>
+      </main>
+
+      <footer class="statusbar">
+        <span id="status">Loading…</span>
+        <span id="privileges" class="muted"></span>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

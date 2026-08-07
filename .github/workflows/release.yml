@@ -1,89 +1,141 @@
-name: Build and Release
+name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build (e.g. v0.1.0)"
+        required: true
 
 permissions:
   contents: write
-  actions: read
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
-  build-macos:
-    runs-on: macos-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-menubar.txt
-        pip install -e .
-    
-    - name: Create app icon
-      run: python scripts/create_app_icon.py
-    
-    - name: Build macOS app
-      run: python scripts/create_macos_app.py
-    
-    - name: Verify build artifacts
-      run: |
-        ls -la dist/
-        if [ ! -f "dist/Portify.dmg" ]; then
-          echo "❌ Portify.dmg not found!"
-          exit 1
-        fi
-        echo "✅ Build artifacts verified"
-    
-    - name: Upload DMG artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Portify-macOS
-        path: dist/Portify.dmg
-    
-    - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
-      with:
-        files: dist/Portify.dmg
-        generate_release_notes: true
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  test:
+  # The desktop app: one installer per platform, built by the official action
+  # which knows how to bundle and sign each format.
+  app:
+    name: app (${{ matrix.label }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11']
-    
+        include:
+          - os: windows-latest
+            label: windows-x86_64
+            args: ""
+          - os: macos-latest
+            label: macos-aarch64
+            args: --target aarch64-apple-darwin
+          - os: macos-latest
+            label: macos-x86_64
+            args: --target x86_64-apple-darwin
+          - os: ubuntu-22.04
+            label: linux-x86_64
+            args: ""
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -e .
-    
-    - name: Test CLI
-      run: |
-        portify --help
-        portify version
-        portify list --help
+      - uses: actions/checkout@v4
+
+      - name: Install Linux desktop dependencies
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ startsWith(matrix.os, 'macos') && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: app
+        run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: app
+          tagName: ${{ github.ref_name }}
+          releaseName: Portify ${{ github.ref_name }}
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+  # The CLI: a plain static-ish binary per platform, attached to the same
+  # release so `portify` can be installed without the desktop app.
+  cli:
+    name: cli (${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            label: windows-x86_64
+            target: x86_64-pc-windows-msvc
+            bin: portify.exe
+          - os: macos-latest
+            label: macos-aarch64
+            target: aarch64-apple-darwin
+            bin: portify
+          - os: macos-latest
+            label: macos-x86_64
+            target: x86_64-apple-darwin
+            bin: portify
+          - os: ubuntu-22.04
+            label: linux-x86_64
+            target: x86_64-unknown-linux-gnu
+            bin: portify
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release -p portify-cli --target ${{ matrix.target }}
+
+      - name: Package
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp "target/${{ matrix.target }}/release/${{ matrix.bin }}" dist/
+          cp README.md LICENSE dist/
+          cd dist
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            7z a "../portify-cli-${{ matrix.label }}.zip" ./*
+          else
+            tar -czf "../portify-cli-${{ matrix.label }}.tar.gz" ./*
+          fi
+
+      - name: Attach to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          files: |
+            portify-cli-${{ matrix.label }}.zip
+            portify-cli-${{ matrix.label }}.tar.gz
+          fail_on_unmatched_files: false

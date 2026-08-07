@@ -1,0 +1,27 @@
+[package]
+name = "portify-app"
+description = "Portify desktop app — every port in use, one click to take one back"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+# Tauri's convention: the app lives in a lib so the same code can be reused by
+# a mobile entry point later; main.rs is a thin shim.
+name = "portify_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.5.0", features = [] }
+
+[dependencies]
+portify-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tauri = { version = "2.11.5", features = ["tray-icon", "image-png"] }
+tauri-plugin-global-shortcut = "2.3.2"
+tauri-plugin-notification = "2.3.1"
+tauri-plugin-single-instance = "2.3.4"
