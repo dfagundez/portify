@@ -7,6 +7,10 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+# The engine and the CLI go to crates.io; this does not. `generate_context!`
+# embeds app/dist at compile time, so a published copy would not build for
+# anyone, and there is nothing here to depend on as a library.
+publish = false
 
 [lib]
 # Tauri's convention: the app lives in a lib so the same code can be reused by

@@ -26,6 +26,15 @@ impl Protocol {
     }
 }
 
+// `as_str` stays the single source of truth; Display just means callers can
+// write `{protocol}` and `.to_string()` without reaching for it. Worth having
+// now that this crate is published for other people to use.
+impl std::fmt::Display for Protocol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
 /// Socket state, normalised across platforms.
 ///
 /// UDP has no state machine, so a bound UDP socket is reported as
@@ -67,6 +76,12 @@ impl SocketState {
             SocketState::Closed => "CLOSED",
             SocketState::Unknown => "UNKNOWN",
         }
+    }
+}
+
+impl std::fmt::Display for SocketState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
     }
 }
 

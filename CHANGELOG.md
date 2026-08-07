@@ -4,6 +4,31 @@ All notable changes to Portify. Format based on [Keep a Changelog](https://keepa
 
 ## Unreleased
 
+### Added
+
+- **Scoop.** This repository is the bucket, so `scoop bucket add portify <repo>`
+  then `scoop install portify` is the whole flow — no second repository, nothing
+  to submit, nobody to wait for.
+- **winget manifests**, validated against Microsoft's 1.6.0 schemas and
+  [submitted](https://github.com/microsoft/winget-pkgs/pull/413867).
+- Manifests are generated and verified by script rather than by hand:
+  `update-packaging.mjs` rewrites them from a published release,
+  `check-packaging.mjs` re-downloads what they point at and fails on a checksum
+  mismatch or a version bumped without its URL following. CI runs the check on
+  every push; publishing a release runs the update and commits it.
+- `Display` for `Protocol` and `SocketState`, so `{protocol}` and `.to_string()`
+  work without reaching for `as_str`. Published-crate ergonomics.
+- Per-crate READMEs, and the `portify-core` examples now compile as doctests —
+  the first version of them named the wrong argument order for `kill_port` and
+  a type that does not implement `Display`, both caught by wiring them in.
+
+### Changed
+
+- `portify-core` and `portify-cli` carry the metadata crates.io wants (readme,
+  keywords, categories, homepage). `portify-app` is marked `publish = false`:
+  `generate_context!` embeds `app/dist` at compile time, so a published copy
+  would not build for anyone.
+
 ### Fixed
 
 - **Usage errors now exit 4, not 2.** Argument parsing errors used clap's

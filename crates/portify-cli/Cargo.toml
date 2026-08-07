@@ -7,6 +7,10 @@ rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+keywords = ["port", "netstat", "kill", "process", "cli"]
+categories = ["command-line-utilities", "network-programming", "development-tools"]
 
 [[bin]]
 name = "portify"

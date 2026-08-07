@@ -21,3 +21,13 @@ pub use system::{is_elevated, system_summary, SystemSummary};
 
 /// Version of the Portify core, reported by the CLI and the app.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Compiles the examples in README.md as doctests.
+///
+/// The README is the crates.io landing page, so its code is the first thing
+/// anyone sees and the last thing anyone checks. Wiring it in here means a
+/// changed signature breaks `cargo test` instead of quietly leaving an example
+/// that has not worked for three releases.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+pub struct Readme;
