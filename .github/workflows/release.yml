@@ -16,10 +16,41 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # Published artefacts are immutable, and nothing else enforces that.
+  #
+  # Force-pushing a tag re-runs this workflow, which rebuilds every binary and
+  # overwrites the release assets — same source, different bytes, different
+  # checksums. That silently invalidates every checksum already published
+  # elsewhere: the Scoop manifest heals itself on the next release, but a
+  # pending winget submission does not, and a merged one would leave every
+  # `winget install` failing its hash check.
+  #
+  # So: a tag that already has a published release does not get rebuilt. Draft
+  # releases are fair game, since those are the ones still being assembled.
+  guard:
+    name: refuse to overwrite a published release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check whether this tag is already published
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          state=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' 2>/dev/null || echo absent)
+          case "$state" in
+            absent) echo "No release for $TAG yet — building." ;;
+            true)   echo "$TAG has a draft release — rebuilding into it is fine." ;;
+            false)
+              echo "::error::$TAG is already published. Rebuilding would replace its assets and break every checksum computed from them. Cut a new version instead, or delete the release first if you really mean to."
+              exit 1
+              ;;
+          esac
+
   # The desktop app: one installer per platform, built by the official action
   # which knows how to bundle and sign each format.
   app:
     name: app (${{ matrix.label }})
+    needs: guard
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -83,6 +114,7 @@ jobs:
   # release so `portify` can be installed without the desktop app.
   cli:
     name: cli (${{ matrix.label }})
+    needs: guard
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

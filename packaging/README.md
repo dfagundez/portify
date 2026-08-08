@@ -90,6 +90,30 @@ The `portify-core` README's examples are compiled as doctests (see the
 `Readme` struct in its `lib.rs`), because the crates.io landing page is the
 first code anyone reads and the last anyone checks.
 
+## Published artefacts are immutable
+
+Not a principle — a rule the release workflow now enforces, because it was
+learned the hard way.
+
+Force-pushing the `v0.1.0` tag (for an unrelated history rewrite) re-triggered
+`release.yml`, which rebuilt all ten binaries and replaced the release assets.
+Same source tree, different bytes, different checksums. Everything downstream
+that had already recorded a checksum was instantly wrong:
+
+- **Scoop** healed itself — `packaging.yml` recomputed and committed the new
+  hash. This is exactly the rot the automation exists to catch, and it caught
+  it.
+- **winget did not**, and could not. The submission to `microsoft/winget-pkgs`
+  had passed validation against the old installer. Merged as-is, every
+  `winget install` would have failed its hash check. It had to be corrected by
+  hand, on a public PR, after a reviewer had already looked at it.
+
+So `release.yml` starts with a `guard` job that refuses to build when the tag
+already has a **published** release. Draft releases still rebuild freely —
+those are the ones still being assembled. To genuinely replace a published
+release, delete it first; the refusal should be a deliberate step, not
+something a stray `git push --force` does on your behalf.
+
 ## Not done yet
 
 - **Homebrew.** A tap has to be its own repository (`homebrew-portify`), and

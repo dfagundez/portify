@@ -35,6 +35,13 @@ All notable changes to Portify. Format based on [Keep a Changelog](https://keepa
 
 ### Fixed
 
+- **A tag push can no longer overwrite a published release.** Force-pushing
+  `v0.1.0` during a history rewrite re-ran the release workflow, which rebuilt
+  every binary and replaced all ten assets — same source, different bytes,
+  different checksums. Scoop healed itself on the next automated sync; the
+  pending winget submission could not, and had to be corrected by hand after it
+  had already passed Microsoft's validation. `release.yml` now refuses to build
+  a tag whose release is already published.
 - **Usage errors now exit 4, not 2.** Argument parsing errors used clap's
   default exit code, which is the same 2 this CLI uses for "nothing found", so
   `portify 3000 || echo free` could not tell a free port from a misspelled
