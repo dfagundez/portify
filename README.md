@@ -30,10 +30,10 @@ Portify is at **0.1.0** and is a ground-up Rust rewrite of an earlier Python ver
 
 | | State |
 |---|---|
-| CLI | Tested by hand on Windows and Linux; compiles clean for macOS |
+| CLI | Tested by hand on Windows and Linux; exercised on macOS by CI on every push (scan, JSON output, `info`, completions, every exit code) |
 | Desktop app | Verified by hand on Windows 11: tray, hotkey, list, filter, kill with confirmation, force-kill, notifications, settings persistence, single instance |
 | Windows | Primary target. CLI and app both verified end to end |
-| macOS | Same code paths, **not yet run on a Mac** |
+| macOS | CLI runs green on CI's macOS runners; the **desktop app has never been launched on a Mac** |
 | Linux | CLI tested; the desktop app is built by CI but not hand-tested |
 | Installers | Built by CI, **not code-signed** — expect a SmartScreen/Gatekeeper warning |
 | Package managers | Scoop and crates.io. winget [submitted](https://github.com/microsoft/winget-pkgs/pull/413867); Homebrew not yet |
