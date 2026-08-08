@@ -7,7 +7,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/dfagundez/portify/releases/download/v0.1.0/portify-cli-windows-x86_64.zip",
-            "hash": "cabe2fa84c310f45f68bea2574886bd3c2f567af859b0bec983769fddbaf78e0"
+            "hash": "b43b93713ec8d0b31bb5273eeb9ab85a6415195f9af9fcbe65c6ec38ac00a651"
         }
     },
     "bin": "portify.exe",
